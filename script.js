@@ -9,25 +9,46 @@ ArrayList baddies;
 ArrayList nails;
 
 int timer;
+boolean gamePlaying = true;
 
 //defining the shape of the level
 
 level = [ "wwwwwwwwwwwwwwwwwwww",
-          "w    w          w  w",
-          "w    w          w  w",
-          "w    w          w  w",
-          "w    wwwwww     w  w",
-          "w               w  w",
-          "wwwwww             w",
+          "w        w   w     w",
+          "w wwwww  w   w www w",
+          "w w      w   w     w",
+          "w w www  w   w www w",
+          "w w                w",
+          "w wwwww            w",
           "w                  w",
-          "w                  w",
-          "w          w       w",
-          "w          w       w",
-          "wwwwwwwwwwwww      w",
-          "w      w           w",
+          "w  w  w            w",
+          "w  w  w     w  w   w",
+          "w           w  w   w",
+          "wwwwwwwwwwwww  w   w",
+          "w      w       w   w",
           "w  w       w       w",
           "wwwwwwwwwwwwwwwwwwww"];
 
+
+
+void endGame(){
+    for(int i = 0; i < baddies.size(); i++){
+        baddies.remove(i);
+    }
+    for(int i = 0; i < nails.size(); i++){
+        nails.remove(i);
+    }
+    gamePlaying = false;
+}
+
+void startGame(){
+    hero.x = 200;
+    hero.y = 400;
+    hero.life = 1;
+    hero.score = 0;
+    timer = 0;
+    gamePlaying = true;
+}
 
 // Setup the Processing Canvas
 void setup(){
@@ -35,7 +56,7 @@ void setup(){
     strokeWeight( 0 );
     frameRate( 60 );
     timer = 0;
-    hero = new Hero(200, 400, 8, 1, 0, 30.0);
+    hero = new Hero(200, 400, 8, 1, 0, 24.0);
     // baddie = new Baddie(300, 400, 10, 1, 0, 20.0);
     baddies = new ArrayList();
     nails = new ArrayList();
@@ -47,45 +68,51 @@ void draw(){
 
 	// Fill canvas grey
 	background(183,191,200);
-
-    for(int i = 0; i < level.length; i++){
-        for(int j = 0; j < level[i].length; j++){
-            if(level[i][j] == "w"){
-                // Set fill-color to blue
-                fill( 37,39,164 );
-                rect(j*40,i*40,40,40);
+    if(gamePlaying){
+        for(int i = 0; i < level.length; i++){
+            for(int j = 0; j < level[i].length; j++){
+                if(level[i][j] == "w"){
+                    // Set fill-color to blue
+                    fill( 37,39,164 );
+                    rect(j*40,i*40,40,40);
+                }
             }
         }
-    }
-    food.draw();
-    for(int i = 0; i < baddies.size(); i++){
-        Baddie b = (Baddie) baddies.get(i);
+        food.draw();
+        for(int i = 0; i < baddies.size(); i++){
+            Baddie b = (Baddie) baddies.get(i);
 
-        if(b.isNailed()){
-            baddies.remove(i);
-            hero.score += 1;
-        }else{
-            if(b.hitHero()){
-                hero.life -= 1;
-            };
-            b.update();
+            if(b.isNailed()){
+                baddies.remove(i);
+                hero.score += 1;
+            }else{
+                if(b.hitHero()){
+                    hero.life -= 1;
+                };
+                b.update();
+            }
         }
-    }
-    for(int i = 0; i < nails.size(); i++){
-        Nail n = (Nail) nails.get(i);
-        n.draw();
-    }
-    // println(timer);
-    if(timer%180 == 0){
-        baddies.add(new Baddie(60, 60, 9, 1, 0, 20.0));
-    }
+        for(int i = 0; i < nails.size(); i++){
+            Nail n = (Nail) nails.get(i);
+            n.draw();
+        }
+        // println(timer);
+        if(timer%180 == 0){
+            baddies.add(new Baddie(60, 60, 9, 1, 0, 20.0));
+        }
 
-    if(food.isEaten()){
-        hero.life += 1;
+        if(food.isEaten()){
+            hero.life += 1;
+        }
+        text("Hero's life: " + str(hero.life) + ", Score: " + str(hero.score), 0, 10, 80, 40,100);
+        timer += 1;
+        hero.update();
+        if(hero.life == 0){
+            endGame();
+        }
+    }else{
+        text("Score: "+str(hero.score)+", play again?: (y for yes)", 0, 10, 80, 40,100);
     }
-    text("Hero's life: " + str(hero.life) + ", Score: " + str(hero.score), 0, 10, 80, 40,100);
-    timer += 1;
-    hero.update();
 }
 
 void keyPressed(){
@@ -108,6 +135,9 @@ void keyPressed(){
     }
     if(key == 32){
         hero.dropNail();
+    }
+    if(key == 'y' && !gamePlaying){
+        startGame();
     }
 }
 
