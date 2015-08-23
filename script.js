@@ -5,6 +5,9 @@
 Hero hero;
 Food food;
 Baddie baddie;
+ArrayList baddies;
+
+ArrayList nails;
 
 //defining the shape of the level
 
@@ -32,8 +35,13 @@ void setup(){
     frameRate( 60 );
 
     hero = new Hero(200, 400, 8, 1, 0, 30.0);
-    baddie = new Baddie(300, 400, 10, 1, 0, 20.0);
-
+    // baddie = new Baddie(300, 400, 10, 1, 0, 20.0);
+    baddies = new ArrayList();
+    nails = new ArrayList();
+    baddies.add(new Baddie(300, 400, 10, 1, 0, 20.0));
+    baddies.add(new Baddie(300, 400, 10, 1, 0, 20.0));
+    baddies.add(new Baddie(300, 400, 10, 1, 0, 20.0));
+    baddies.add(new Baddie(300, 400, 10, 1, 0, 20.0));
     food = new Food();
 }
 
@@ -62,7 +70,15 @@ void draw(){
         }
     }
     food.draw();
-    baddie.update();
+    for(int i = 0; i < baddies.size(); i++){
+        Baddie b = (Baddie) baddies.get(i);
+        b.update();
+    }
+    for(int i = 0; i < nails.size(); i++){
+        Nail n = (Nail) nails.get(i);
+        n.draw();
+    }
+
     hero.update();
 }
 
@@ -84,6 +100,9 @@ void keyPressed(){
         hero.dirX = 1;
         hero.dirY = 0;
     }
+    if(key == 32){
+        hero.dropNail();
+    }
 }
 
 class Food {
@@ -96,11 +115,29 @@ class Food {
     void changePos(){
         this.x = int(random(40, width - 40));
         this.y = int(random(40, height - 40));
+        if(level[int(this.y/40)][int(this.x/40)] == "w"){
+            changePos();
+        }
     }
 
     void draw() {
         fill(37,39,51);
         ellipse(this.x,this.y,10,10);
+    }
+
+}
+
+class Nail {
+    int x, y;
+
+    Nail(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
+
+    void draw() {
+        fill(3,3,5);
+        ellipse(this.x,this.y,30,30);
     }
 
 }
@@ -118,6 +155,10 @@ class Hero {
         this.dirX = dirX;
         this.dirY = dirY;
         this.diameter = diameter;
+    }
+
+    void dropNail(){
+        nails.add(new Nail(this.x, this.y));
     }
 
     void update(){
