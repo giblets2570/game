@@ -32,10 +32,10 @@ level = [ "wwwwwwwwwwwwwwwwwwww",
 
 
 void endGame(){
-    for(int i = 0; i < baddies.size(); i++){
+    for(int i = baddies.size() - 1; i >= 0; i--){
         baddies.remove(i);
     }
-    for(int i = 0; i < nails.size(); i++){
+    for(int i = nails.size(); i >= 0; i--){
         nails.remove(i);
     }
     gamePlaying = false;
@@ -53,7 +53,8 @@ void startGame(){
 // Setup the Processing Canvas
 void setup(){
     size( 800, 600 );
-    strokeWeight( 0 );
+    // strokeWeight( 0 );
+    // noStroke();
     frameRate( 60 );
     timer = 0;
     hero = new Hero(200, 400, 8, 1, 0, 24.0);
@@ -69,6 +70,7 @@ void draw(){
 	// Fill canvas grey
 	background(183,191,200);
     if(gamePlaying){
+        noStroke();
         for(int i = 0; i < level.length; i++){
             for(int j = 0; j < level[i].length; j++){
                 if(level[i][j] == "w"){
@@ -78,6 +80,7 @@ void draw(){
                 }
             }
         }
+        strokeWeight(1);
         food.draw();
         for(int i = 0; i < baddies.size(); i++){
             Baddie b = (Baddie) baddies.get(i);
@@ -324,9 +327,8 @@ class Baddie {
                 this.y -= this.dirY*this.speed;
                 this.chooseNewDir();
             }
-            fill(155,39,51);
         }
-
+        fill(155,39,51);
         ellipse( this.x, this.y, this.diameter,this.diameter);
     }
 
