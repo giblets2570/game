@@ -4,16 +4,16 @@
 
 Hero hero;
 Food food;
-
+Baddie baddie;
 
 //defining the shape of the level
 
 level = [ "wwwwwwwwwwwwwwwwwwww",
-          "w    w             w",
-          "w    w             w",
-          "w    w             w",
-          "w    wwwwww        w",
-          "w                  w",
+          "w    w          w  w",
+          "w    w          w  w",
+          "w    w          w  w",
+          "w    wwwwww     w  w",
+          "w               w  w",
           "w                  w",
           "w                  w",
           "w                  w",
@@ -32,6 +32,8 @@ void setup(){
     frameRate( 60 );
 
     hero = new Hero(200, 400, 8, 1, 0, 30.0);
+    baddie = new Baddie(300, 400, 10, 1, 0, 20.0);
+
     food = new Food();
 }
 
@@ -44,8 +46,8 @@ void draw(){
 	// Set fill-color to blue
 	fill( 37,39,164 );
 
-	// Set stroke-color white
-	stroke(255);
+	// // Set stroke-color white
+	// stroke(255);
 
 	// Draw circle
 	// ellipse( X, Y, diameter, diameter );
@@ -60,8 +62,8 @@ void draw(){
         }
     }
     food.draw();
+    baddie.update();
     hero.update();
-
 }
 
 void keyPressed(){
@@ -92,8 +94,8 @@ class Food {
     }
 
     void changePos(){
-        this.x = int(random(20, width - 20));
-        this.y = int(random(20, height - 20));
+        this.x = int(random(40, width - 40));
+        this.y = int(random(40, height - 40));
     }
 
     void draw() {
@@ -139,7 +141,70 @@ class Hero {
             this.x -= this.dirX*this.speed;
             this.y -= this.dirY*this.speed;
         }
+        fill(15,144,51);
+        ellipse( this.x, this.y, this.diameter,this.diameter);
+    }
 
+}
+
+class Baddie {
+
+    int dirX, dirY, speed, x, y;
+
+    float diameter;
+
+    Baddie (int x, int y,int speed, int dirX, int dirY, float diameter){
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.dirX = dirX;
+        this.dirY = dirY;
+        this.diameter = diameter;
+    }
+
+    void chooseNewDir(){
+        int newDir = int(random(0,4));
+        if(newDir%2==0){
+            this.dirX = 0;
+            if(newDir==2){
+                this.dirY=1;
+            }else{
+                this.dirY=-1;
+            }
+        }else{
+            this.dirY = 0;
+            if(newDir==3){
+                this.dirX=1;
+            }else{
+                this.dirX=-1;
+            }
+        }
+    }
+
+    void update(){
+        this.x += this.dirX*this.speed;
+        this.y += this.dirY*this.speed;
+
+        int x1, y1, x2, y2;
+
+        if(dirY == 0){
+            x1 = int((this.x + dirX*diameter / 2) / 40);
+            x2 = int((this.x + dirX*diameter / 2) / 40);
+            y1 = int((this.y + diameter / 2) / 40);
+            y2 = int((this.y - diameter / 2) / 40);
+        }else if(dirX == 0){
+            y1 = int((this.y + dirY*diameter / 2) / 40);
+            y2 = int((this.y + dirY*diameter / 2) / 40);
+            x1 = int((this.x + diameter / 2) / 40);
+            x2 = int((this.x - diameter / 2) / 40);
+        }
+
+        if(level[y1][x1] == "w" || level[y2][x2] == "w"){
+            this.x -= this.dirX*this.speed;
+            this.y -= this.dirY*this.speed;
+            this.chooseNewDir();
+        }
+        fill(155,39,51);
         ellipse( this.x, this.y, this.diameter,this.diameter);
     }
 
