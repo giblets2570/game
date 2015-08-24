@@ -254,13 +254,13 @@ class Hero {
         stroke(0,0,0);
         if(this.x < 0){
             this.x += screenWidth;
-        }else if(this.x > screenWidth){
-            this.x = 0
+        }else if(this.x >= screenWidth){
+            this.x -= screenWidth;
         }
         if(this.y < 0){
             this.y += screenHeight;
-        }else if(this.y > screenWidth){
-            this.y = 0
+        }else if(this.y >= screenWidth){
+            this.y -= screenHeight;
         }
         ellipse( this.x, this.y, this.diameter,this.diameter);
     }
@@ -354,10 +354,6 @@ class Baddie {
                 y2 = int(((this.y + dirY*diameter / 2) % screenHeight) / 40);
                 x1 = int(((this.x + diameter / 2) % screenWidth) / 40);
                 x2 = int(((this.x - diameter / 2) % screenWidth) / 40);
-            }
-            if(level.get(y1,x1) == "w" || level.get(y2,x2) == "w"){
-                this.x -= this.dirX*this.speed;
-                this.y -= this.dirY*this.speed;
             }
 
             if(level.get(y1,x1) == "w" || level.get(y2,x2) == "w"){

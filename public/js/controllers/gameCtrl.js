@@ -1,0 +1,375 @@
+app.controller('gameController',['$scope',function(scope){
+
+	scope.sketch = function(sketch) {
+    	// Initialize sketch
+
+    	sketch.sWidth = 800;
+    	sketch.sHeight = 600;
+
+    	sketch.gamePlaying = true;
+
+    	sketch.maps = [[ "wwwwwwwwwwwwwwwwwwww",
+          "         w   w      ",
+          "w wwwww  w   w www w",
+          "w w      w   w     w",
+          "w w www  w   w www w",
+          "w w                w",
+          "w wwwww            w",
+          "w                  w",
+          "w  w  w            w",
+          "w  w  w     w   w  w",
+          "w           w   w  w",
+          "wwwwwwwwwwwww   w  w",
+          "w      w        w  w",
+          "w  w       w       w",
+          "wwwwwwwwwwwwwwwwwwww"],
+        [ "wwwwwwwwwwwwwwwwwwww",
+          "w        w         w",
+          "w wwwww  w w w w w w",
+          "w     w  w         w",
+          "w   w w  w w w w w w",
+          "w     w            w",
+          "w wwwww            w",
+          "w                  w",
+          "w  wwww            w",
+          "w  w  w     w   w  w",
+          "w           w   w  w",
+          "ww          w   w  w",
+          "w      w        w  w",
+          "w  w       w       w",
+          "wwwwwwwwwwwwwwwwwwww"]];
+
+        sketch.startGame = function(){
+		    sketch.hero.x = 200;
+		    sketch.hero.y = 400;
+		    sketch.hero.life = 1;
+		    sketch.hero.score = 0;
+		    sketch.timer = 0;
+		    sketch.level.generateMap();
+		    sketch.gamePlaying = true;
+		}
+
+		sketch.endGame = function(){
+		    for(var i = sketch.baddies.length - 1; i >= 0; i--){
+		        sketch.baddies.splice(i,1);
+		    }
+		    for(var i = sketch.nails.length - 1; i >= 0; i--){
+		        sketch.nails.splice(i,1);
+		    }
+		    sketch.gamePlaying = false;
+		}
+
+        sketch.setup = function() {
+	      	sketch.size(sketch.sWidth, sketch.sHeight);
+	      	sketch.frameRate(60);
+	      	sketch.hero = new Hero(200, 400, 8, 1, 0, 24.0);
+	      	sketch.level = new Level();
+	      	sketch.food = new Food();
+	      	sketch.nails = [];
+	      	sketch.baddies = [];
+	      	sketch.timer = 0;
+	    };
+
+    	function Hero(x, y,speed, dirX, dirY, diameter) {
+		    // Public properties, assigned to the instance ('this')
+		    this.x = x;
+	        this.y = y;
+	        this.speed = speed;
+	        this.dirX = dirX;
+	        this.dirY = dirY;
+	        this.diameter = diameter;
+	        this.life = 1;
+	        this.score = 0;
+
+	         this.dropNail = function(){
+		        if(this.life > 1){
+		            this.life -= 1;
+		            sketch.nails.push(new Nail(this.x, this.y));
+		        }
+		    }
+
+	        this.update = function() {
+				this.x += this.dirX*this.speed;
+		    	this.y += this.dirY*this.speed;
+
+		    	var x1,x2,y1,y2;
+		        if(this.dirY == 0){
+		            x1 = Math.floor(((this.x + this.dirX*this.diameter / 2) % sketch.sWidth) / 40);
+		            x2 = Math.floor(((this.x + this.dirX*this.diameter / 2) % sketch.sWidth) / 40);
+		            y1 = Math.floor(((this.y + this.diameter / 2) % sketch.sHeight) / 40);
+		            y2 = Math.floor(((this.y - this.diameter / 2) % sketch.sHeight) / 40);
+		        }else if(this.dirX == 0){
+		            y1 = Math.floor(((this.y + this.dirY*this.diameter / 2) % sketch.sHeight) / 40);
+		            y2 = Math.floor(((this.y + this.dirY*this.diameter / 2) % sketch.sHeight) / 40);
+		            x1 = Math.floor(((this.x + this.diameter / 2) % sketch.sWidth) / 40);
+		            x2 = Math.floor(((this.x - this.diameter / 2) % sketch.sWidth) / 40);
+		        }
+
+		        if(sketch.level.get(y1,x1) == "w" || sketch.level.get(y2,x2) == "w"){
+		            this.x -= this.dirX*this.speed;
+		            this.y -= this.dirY*this.speed;
+		        }
+		        sketch.fill(15,144,51);
+		        sketch.stroke(0,0,0);
+		        if(this.x < 0){
+		            this.x += sketch.sWidth;
+		        }else if(this.x >= sketch.sWidth){
+		            this.x -= sketch.sWidth;
+		        }
+		        if(this.y < 0){
+		            this.y += sketch.sHeight;
+		        }else if(this.y >= sketch.sWidth){
+		            this.y -= sketch.sHeight;
+		        }
+		        sketch.ellipse( this.x, this.y, this.diameter,this.diameter);
+			}
+		};
+
+		function Food() {
+
+		    this.changePos = function(){
+		        this.x = Math.floor(Math.random()* (sketch.sWidth - 80)) + 40;
+		        this.y = Math.floor(Math.random()* (sketch.sHeight - 80)) + 40;
+
+		        if(sketch.level.get(Math.floor(this.y/40),Math.floor(this.x/40)) == "w"){
+		            this.changePos();
+		        }
+		    };
+		    this.changePos();
+
+		    this.draw = function() {
+		        sketch.fill(37,39,51);
+		        sketch.stroke(0,0,0);
+		        sketch.ellipse(this.x,this.y,10,10);
+		    }
+
+		    this.isEaten = function(){
+		        if(sketch.hero.x - sketch.hero.diameter < this.x && sketch.hero.x + sketch.hero.diameter > this.x
+		            && sketch.hero.y - sketch.hero.diameter < this.y && sketch.hero.y + sketch.hero.diameter > this.y){
+
+		            this.changePos();
+
+		            return true;
+		        }
+		        return false;
+		    }
+
+		}
+
+		function Nail(x, y) {
+	        this.x = x;
+	        this.y = y;
+	        this.radius = 30;
+
+		    this.draw = function(){
+		        sketch.fill(3,3,5);
+		        sketch.stroke(255,255,255);
+		        sketch.ellipse(this.x,this.y,this.radius,this.radius);
+		    }
+		}
+
+		function Baddie(speed, dirX, dirY, diameter) {
+
+	        this.speed = speed;
+	        this.dirX = dirX;
+	        this.dirY = dirY;
+	        this.diameter = diameter;
+	        this.timer = 0;
+
+		    this.setPos = function(){
+		        this.x = Math.floor(Math.random()* (sketch.sWidth - 120)) + 60;
+		        this.y = Math.floor(Math.random()* (sketch.sHeight - 120)) + 60;
+		        if(sketch.level.get(Math.floor(this.y/40),Math.floor(this.x/40)) == "w"){
+		            this.setPos();
+		        }
+		    }
+
+		    this.setPos();
+
+		    this.chooseNewDir = function(){
+		        var newDir = Math.floor((Math.random()*4));
+		        if(newDir%2==0){
+		            this.dirX = 0;
+		            if(newDir==2){
+		                this.dirY=1;
+		            }else{
+		                this.dirY=-1;
+		            }
+		        }else{
+		            this.dirY = 0;
+		            if(newDir==3){
+		                this.dirX=1;
+		            }else{
+		                this.dirX=-1;
+		            }
+		        }
+		    }
+
+		    this.isNailed = function(){
+		        for(var i = sketch.nails.length - 1; i >= 0; i--){
+		            var n =  sketch.nails[i];
+		            if(n.x - n.radius < this.x && n.x + n.radius > this.x
+		                && n.y - n.radius < this.y && n.y + n.radius > this.y){
+		                sketch.nails.splice(i,1);
+		                return true;
+		            }
+		        }
+		        return false;
+		    }
+
+		     this.hitHero = function(){
+		        if(this.timer > 0){
+		            return false;
+		        }
+		        if(sketch.hero.x - sketch.hero.diameter < this.x && sketch.hero.x + sketch.hero.diameter > this.x
+		            && sketch.hero.y - sketch.hero.diameter < this.y && sketch.hero.y + sketch.hero.diameter > this.y){
+		            this.timer = 60;
+		            return true;
+		        }
+		        return false;
+		    }
+
+		    this.update = function(){
+		        if(this.timer > 0){
+		            this.timer -= 1;
+		        }else{
+		            this.x += this.dirX*this.speed;
+		            this.y += this.dirY*this.speed;
+
+		            var x1,x2,y1,y2;
+			        if(this.dirY == 0){
+			            x1 = Math.floor(((this.x + this.dirX*this.diameter / 2) % sketch.sWidth) / 40);
+			            x2 = Math.floor(((this.x + this.dirX*this.diameter / 2) % sketch.sWidth) / 40);
+			            y1 = Math.floor(((this.y + this.diameter / 2) % sketch.sHeight) / 40);
+			            y2 = Math.floor(((this.y - this.diameter / 2) % sketch.sHeight) / 40);
+			        }else if(this.dirX == 0){
+			            y1 = Math.floor(((this.y + this.dirY*this.diameter / 2) % sketch.sHeight) / 40);
+			            y2 = Math.floor(((this.y + this.dirY*this.diameter / 2) % sketch.sHeight) / 40);
+			            x1 = Math.floor(((this.x + this.diameter / 2) % sketch.sWidth) / 40);
+			            x2 = Math.floor(((this.x - this.diameter / 2) % sketch.sWidth) / 40);
+			        }
+
+			        if(sketch.level.get(y1,x1) == "w" || sketch.level.get(y2,x2) == "w"){
+			            this.x -= this.dirX*this.speed;
+			            this.y -= this.dirY*this.speed;
+			            this.chooseNewDir()
+			        }
+		        }
+		        if(this.x < 0){
+		            this.x += sketch.sWidth;
+		        }else if(this.x >= sketch.sWidth){
+		            this.x -= sketch.sWidth;
+		        }
+		        if(this.y < 0){
+		            this.y += sketch.sHeight;
+		        }else if(this.y >= sketch.sWidth){
+		            this.y -= sketch.sHeight;
+		        }
+		        sketch.fill(155,39,51);
+		        sketch.stroke(0,0,0);
+		        sketch.ellipse( this.x, this.y, this.diameter,this.diameter);
+		    }
+
+		}
+
+		function Level() {
+
+			this.generateMap = function(){
+		        var map_choice = Math.floor((Math.random() * sketch.maps.length));
+		        this.map = sketch.maps[map_choice];
+		    };
+		    this.generateMap();
+		    this.get = function(i,j){
+		        return this.map[i][j];
+		    };
+		    this.draw = function(){
+		        sketch.noStroke();
+		        for(var i = 0; i < this.map.length; i++){
+		            for(var j = 0; j < this.map[i].length; j++){
+		                if(this.map[i][j] == "w"){
+		                    // Set fill-color to blue
+		                    sketch.fill(37,39,164);
+		                    sketch.rect(j*40,i*40,40,40);
+		                };
+		            };
+		        }
+		    }
+
+		};
+
+		sketch.keyPressed = function(){
+			// Conditionally display based on string value
+			console.log(sketch.key.code);
+		    if (sketch.key.code == 119) {
+		        sketch.hero.dirX = 0;
+		        sketch.hero.dirY = -1;
+		    }
+		    if (sketch.key.code == 115) {
+		        sketch.hero.dirX = 0;
+		        sketch.hero.dirY = 1;
+		    }
+		    if (sketch.key.code == 97) {
+		        sketch.hero.dirX = -1;
+		        sketch.hero.dirY = 0;
+		    }
+		    if (sketch.key.code == 100) {
+		        sketch.hero.dirX = 1;
+		        sketch.hero.dirY = 0;
+		    }
+		    if(sketch.key == 32){
+		        sketch.hero.dropNail();
+		    }
+		    if(sketch.key == 121 && !sketch.gamePlaying){
+		        sketch.startGame();
+		    }
+		}
+
+			// Main draw loop
+		sketch.draw = function() {
+			sketch.background(183,191,200);
+
+			if(sketch.gamePlaying){
+				sketch.level.draw();
+				sketch.food.draw();
+				for(var i = sketch.baddies.length - 1; i >= 0; i--){
+		            var b = sketch.baddies[i];
+		            if(b.isNailed()){
+		                sketch.baddies.splice(i,1);
+		                sketch.hero.score += 1;
+		            }else{
+		                if(b.hitHero()){
+		                    sketch.hero.life -= 1;
+		                };
+		                b.update();
+		            }
+		        }
+
+		        if(sketch.timer%180 == 0){
+		            if(sketch.baddies.length < 40){
+		                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
+		            }
+		        }
+		        sketch.timer += 1;
+				if(sketch.food.isEaten()){
+		            sketch.hero.life += 1;
+		        }
+
+		        for(var i = 0; i < sketch.nails.length; i++){
+	            	var n = sketch.nails[i];
+	            	n.draw();
+	        	}
+	        	sketch.text("Hero's life: " + sketch.hero.life + ", Score: " + sketch.hero.score, 0, 10, 80, 40,100);
+	        	sketch.hero.update();
+
+	        	if(sketch.hero.life <= 0){
+		            sketch.endGame();
+		        }
+
+			}else{
+				sketch.text("Score: "+ sketch.hero.score+", play again?: (y for yes)", 0, 10, 80, 40,100);
+			}
+
+		};
+	};
+
+}]);

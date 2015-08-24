@@ -1,5 +1,8 @@
  // app/routes.js
 
+var User = require('./models/user');
+var Level = require('./models/level');
+
 // grab the models we want
 
     module.exports = function(app,express) {
@@ -17,29 +20,27 @@
             next(); // make sure we go to the next routes and don't stop here
         });
 
-        // router.route('/venue')
+        router.route('/level')
 
-        //     .get(function(req,res){
-        //         Venue.find(function(err,venues){
-        //             if(err)
-        //                 return res.send(err);
-        //             res.send(venues);
-        //         });
-        //     })
+            .get(function(req,res){
+                Level.find(function(err,levels){
+                    if(err)
+                        return res.send(err);
+                    res.send(levels);
+                });
+            })
 
-        //     .post(function(req,res){
-        //         var venue = new Venue();
-        //         venue.name = req.body.name;
-        //         venue.rating = req.body.rating;
-        //         venue.type = req.body.type;
-        //         venue.coordinates.latitude = req.body.latitude;
-        //         venue.coordinates.longitude = req.body.longitude; 
-        //         venue.save(function(err){
-        //             if(err)
-        //                 return res.send(err);
-        //             res.send({'message':'Venue added'});
-        //         });
-        //     });
+            .post(function(req,res){
+                var level = new Level();
+                for(var i = 0; i < req.body.map.length; i++){
+                    level.map.push(req.body.map[i]);
+                }
+                level.save(function(err){
+                    if(err)
+                        return res.send(err);
+                    res.send({'message':'Level added'});
+                });
+            });
 
         // router.route('/venue/:latitude/:longitude')
 

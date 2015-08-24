@@ -1,12 +1,17 @@
-<html>
-<head>
-	<title>Game</title>
-	<link rel="stylesheet" type="text/css" href="./css/style.css">
-</head>
-<body>
-	<canvas data-processing-sources="./js/game.js" id="game"></canvas>
-	<embed loop="true" src="./libs/music.wav" hidden="true" type="video/quicktime"></embed>
-</body>
-<script type="text/javascript" src="./libs/processing.min.js"></script>
-<script type="text/javascript" src="./js/game.js"></script>
+<html ng-app='app'>
+	<head >
+		<title>Game</title>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
+	</head>
+	<body ng-controller='gameController'>
+		<!-- <canvas data-processing-sources="./js/game.js" id="game"></canvas> -->
+		<canvas processing="sketch"></canvas>
+	</body>
+	<script type="text/javascript" src="./libs/processing.min.js"></script>
+	<!-- // <script type="text/javascript" src="./js/game.js"></script> -->
+	<script src="libs/jquery/dist/jquery.min.js"></script>
+    <script src="libs/angular/angular.min.js"></script>
+	<script type="text/javascript" src="./js/app.js"></script>
+	<script type="text/javascript" src="./js/controllers/gameCtrl.js"></script>
+	<script type="text/javascript" src="./js/directives/gameDir.js"></script>
 </html>
