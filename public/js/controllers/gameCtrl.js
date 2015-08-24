@@ -1,4 +1,4 @@
-app.controller('gameController',['$scope',function(scope){
+app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 
 	scope.sketch = function(sketch) {
     	// Initialize sketch
@@ -6,38 +6,21 @@ app.controller('gameController',['$scope',function(scope){
     	sketch.sWidth = 800;
     	sketch.sHeight = 600;
 
-    	sketch.gamePlaying = true;
+    	sketch.gamePlaying = false;
+    	sketch.loading = true;
+    	sketch.initializing = true;
 
-    	sketch.maps = [[ "wwwwwwwwwwwwwwwwwwww",
-          "         w   w      ",
-          "w wwwww  w   w www w",
-          "w w      w   w     w",
-          "w w www  w   w www w",
-          "w w                w",
-          "w wwwww            w",
-          "w                  w",
-          "w  w  w            w",
-          "w  w  w     w   w  w",
-          "w           w   w  w",
-          "wwwwwwwwwwwww   w  w",
-          "w      w        w  w",
-          "w  w       w       w",
-          "wwwwwwwwwwwwwwwwwwww"],
-        [ "wwwwwwwwwwwwwwwwwwww",
-          "w        w         w",
-          "w wwwww  w w w w w w",
-          "w     w  w         w",
-          "w   w w  w w w w w w",
-          "w     w            w",
-          "w wwwww            w",
-          "w                  w",
-          "w  wwww            w",
-          "w  w  w     w   w  w",
-          "w           w   w  w",
-          "ww          w   w  w",
-          "w      w        w  w",
-          "w  w       w       w",
-          "wwwwwwwwwwwwwwwwwwww"]];
+    	Levels.query().$promise.then(function(data){
+    		console.log(data.length);
+    		sketch.maps = [];
+    		for(var i = 0; i < data.length; i++){
+    			sketch.maps.push(data[i]._id);
+    		}
+    		// console.log(sketch.maps);
+    		scope.setup();
+    		// sketch.startGame();
+    	});
+
 
         sketch.startGame = function(){
 		    sketch.hero.x = 200;
@@ -45,8 +28,11 @@ app.controller('gameController',['$scope',function(scope){
 		    sketch.hero.life = 1;
 		    sketch.hero.score = 0;
 		    sketch.timer = 0;
-		    sketch.level.generateMap();
-		    sketch.gamePlaying = true;
+		    sketch.level.generateMap(function(data){
+		    	sketch.level.map = data.map;
+		    	sketch.gamePlaying = true;
+		    	sketch.loading = false;
+		    });
 		}
 
 		sketch.endGame = function(){
@@ -59,15 +45,20 @@ app.controller('gameController',['$scope',function(scope){
 		    sketch.gamePlaying = false;
 		}
 
-        sketch.setup = function() {
-	      	sketch.size(sketch.sWidth, sketch.sHeight);
-	      	sketch.frameRate(60);
-	      	sketch.hero = new Hero(200, 400, 8, 1, 0, 24.0);
-	      	sketch.level = new Level();
-	      	sketch.food = new Food();
-	      	sketch.nails = [];
-	      	sketch.baddies = [];
-	      	sketch.timer = 0;
+        scope.setup = function() {
+        	sketch.level = new Level();
+    		sketch.level.generateMap(function(data){
+		    	sketch.level.map = data.map;
+		    	sketch.size(sketch.sWidth, sketch.sHeight);
+		      	sketch.frameRate(60);
+		      	sketch.hero = new Hero(200, 400, 8, 1, 0, 24.0);
+		      	sketch.food = new Food();
+		      	sketch.nails = [];
+		      	sketch.baddies = [];
+		      	sketch.timer = 0;
+		      	sketch.gamePlaying = true;
+		    	sketch.loading = false;
+		    });
 	    };
 
     	function Hero(x, y,speed, dirX, dirY, diameter) {
@@ -274,11 +265,11 @@ app.controller('gameController',['$scope',function(scope){
 
 		function Level() {
 
-			this.generateMap = function(){
+			this.generateMap = function(callback){
 		        var map_choice = Math.floor((Math.random() * sketch.maps.length));
-		        this.map = sketch.maps[map_choice];
+		        Levels.get({level_id:sketch.maps[map_choice]},callback);
 		    };
-		    this.generateMap();
+		    // this.generateMap();
 		    this.get = function(i,j){
 		        return this.map[i][j];
 		    };
@@ -327,7 +318,6 @@ app.controller('gameController',['$scope',function(scope){
 			// Main draw loop
 		sketch.draw = function() {
 			sketch.background(183,191,200);
-
 			if(sketch.gamePlaying){
 				sketch.level.draw();
 				sketch.food.draw();
@@ -365,7 +355,9 @@ app.controller('gameController',['$scope',function(scope){
 		            sketch.endGame();
 		        }
 
-			}else{
+			}else if(sketch.loading){
+				sketch.text("Loading");
+			}else {
 				sketch.text("Score: "+ sketch.hero.score+", play again?: (y for yes)", 0, 10, 80, 40,100);
 			}
 

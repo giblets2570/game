@@ -20,7 +20,7 @@ var Level = require('./models/level');
             next(); // make sure we go to the next routes and don't stop here
         });
 
-        router.route('/level')
+        router.route('/levels')
 
             .get(function(req,res){
                 Level.find(function(err,levels){
@@ -39,6 +39,24 @@ var Level = require('./models/level');
                     if(err)
                         return res.send(err);
                     res.send({'message':'Level added'});
+                });
+            })
+
+            .delete(function(req,res){
+                Level.remove(function(err,levels){
+                    if(err)
+                        return res.send(err);
+                    res.send({'message':'Levels deleted'});
+                });
+            })
+
+        router.route('/levels/:level_id')
+
+            .get(function(req,res){
+                Level.findById(req.params.level_id, function(err,level){
+                    if(err)
+                        return res.send(err);
+                    res.send(level);
                 });
             });
 
