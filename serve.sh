@@ -1,1 +1,1 @@
- python -m SimpleHTTPServer 8000
+nodemon server.js
