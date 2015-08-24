@@ -7,13 +7,14 @@ Food food;
 Baddie baddie;
 ArrayList baddies;
 ArrayList nails;
+Level level;
 
 int timer;
 boolean gamePlaying = true;
 
 //defining the shape of the level
 
-level = [ "wwwwwwwwwwwwwwwwwwww",
+maps = [[ "wwwwwwwwwwwwwwwwwwww",
           "w        w   w     w",
           "w wwwww  w   w www w",
           "w w      w   w     w",
@@ -22,13 +23,27 @@ level = [ "wwwwwwwwwwwwwwwwwwww",
           "w wwwww            w",
           "w                  w",
           "w  w  w            w",
-          "w  w  w     w  w   w",
-          "w           w  w   w",
-          "wwwwwwwwwwwww  w   w",
-          "w      w       w   w",
+          "w  w  w     w   w  w",
+          "w           w   w  w",
+          "wwwwwwwwwwwww   w  w",
+          "w      w        w  w",
           "w  w       w       w",
-          "wwwwwwwwwwwwwwwwwwww"];
-
+          "wwwwwwwwwwwwwwwwwwww"],
+        [ "wwwwwwwwwwwwwwwwwwww",
+          "w        w         w",
+          "w wwwww  w w w w w w",
+          "w     w  w         w",
+          "w   w w  w w w w w w",
+          "w     w            w",
+          "w wwwww            w",
+          "w                  w",
+          "w  wwww            w",
+          "w  w  w     w   w  w",
+          "w           w   w  w",
+          "ww          w   w  w",
+          "w      w        w  w",
+          "w  w       w       w",
+          "wwwwwwwwwwwwwwwwwwww"]];
 
 
 void endGame(){
@@ -47,16 +62,17 @@ void startGame(){
     hero.life = 1;
     hero.score = 0;
     timer = 0;
+    level.generateMap();
     gamePlaying = true;
 }
 
 // Setup the Processing Canvas
 void setup(){
     size( 800, 600 );
-    // strokeWeight( 0 );
-    // noStroke();
+    strokeWeight(1);
     frameRate( 60 );
     timer = 0;
+    level = new Level();
     hero = new Hero(200, 400, 8, 1, 0, 24.0);
     // baddie = new Baddie(300, 400, 10, 1, 0, 20.0);
     baddies = new ArrayList();
@@ -66,21 +82,20 @@ void setup(){
 
 // Main draw loop
 void draw(){
-
 	// Fill canvas grey
 	background(183,191,200);
     if(gamePlaying){
         noStroke();
-        for(int i = 0; i < level.length; i++){
-            for(int j = 0; j < level[i].length; j++){
-                if(level[i][j] == "w"){
-                    // Set fill-color to blue
-                    fill( 37,39,164 );
-                    rect(j*40,i*40,40,40);
-                }
-            }
-        }
-        strokeWeight(1);
+        // for(int i = 0; i < level.length; i++){
+        //     for(int j = 0; j < level[i].length; j++){
+        //         if(level[i][j] == "w"){
+        //             // Set fill-color to blue
+        //             fill( 37,39,164 );
+        //             rect(j*40,i*40,40,40);
+        //         }
+        //     }
+        // }
+        level.draw();
         food.draw();
         for(int i = 0; i < baddies.size(); i++){
             Baddie b = (Baddie) baddies.get(i);
@@ -101,7 +116,9 @@ void draw(){
         }
         // println(timer);
         if(timer%180 == 0){
-            baddies.add(new Baddie(60, 60, 9, 1, 0, 20.0));
+            if(baddies.size() < 40){
+                baddies.add(new Baddie(60, 60, 9, 1, 0, 20.0));
+            }
         }
 
         if(food.isEaten()){
@@ -154,13 +171,14 @@ class Food {
     void changePos(){
         this.x = int(random(40, width - 40));
         this.y = int(random(40, height - 40));
-        if(level[int(this.y/40)][int(this.x/40)] == "w"){
+        if(level.get(int(this.y/40),int(this.x/40)) == "w"){
             changePos();
         }
     }
 
     void draw() {
         fill(37,39,51);
+        stroke(0,0,0);
         ellipse(this.x,this.y,10,10);
     }
 
@@ -186,9 +204,9 @@ class Nail {
 
     void draw() {
         fill(3,3,5);
+        stroke(255,255,255);
         ellipse(this.x,this.y,this.radius,this.radius);
     }
-
 }
 
 class Hero {
@@ -232,11 +250,12 @@ class Hero {
             x1 = int((this.x + diameter / 2) / 40);
             x2 = int((this.x - diameter / 2) / 40);
         }
-        if(level[y1][x1] == "w" || level[y2][x2] == "w"){
+        if(level.get(y1,x1) == "w" || level.get(y2,x2) == "w"){
             this.x -= this.dirX*this.speed;
             this.y -= this.dirY*this.speed;
         }
         fill(15,144,51);
+        stroke(0,0,0);
         ellipse( this.x, this.y, this.diameter,this.diameter);
     }
 
@@ -322,14 +341,48 @@ class Baddie {
                 x2 = int((this.x - diameter / 2) / 40);
             }
 
-            if(level[y1][x1] == "w" || level[y2][x2] == "w"){
+            if(level.get(y1,x1) == "w" || level.get(y2,x2) == "w"){
                 this.x -= this.dirX*this.speed;
                 this.y -= this.dirY*this.speed;
                 this.chooseNewDir();
             }
         }
         fill(155,39,51);
+        stroke(0,0,0);
         ellipse( this.x, this.y, this.diameter,this.diameter);
+    }
+
+}
+
+class Level {
+
+    String[] map;
+
+
+    Level (){
+        this.generateMap();
+    }
+
+    void generateMap(){
+        int map_choice = int(random(0,2))
+
+        this.map = maps[map_choice];
+    }
+
+    String get(i,j){
+        return this.map[i][j];
+    }
+
+    void draw(){
+        for(int i = 0; i < this.map.length; i++){
+            for(int j = 0; j < this.map[i].length; j++){
+                if(this.map[i][j] == "w"){
+                    // Set fill-color to blue
+                    fill(37,39,164);
+                    rect(j*40,i*40,40,40);
+                }
+            }
+        }
     }
 
 }
