@@ -57,6 +57,10 @@ app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage', funct
 	}
 
 	scope.submit = function(){
+		if(scope.levelName == null || scope.levelName == ""){
+			scope.message = "Give you level a name!";
+			return;
+		}
 		if(storage.user){
 			scope.message = "Saving...";
 			Levels.save({map:convertToString(),name:scope.levelName},function(data){
