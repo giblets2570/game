@@ -1,0 +1,20 @@
+<div class='row' style='height:50px;'>
+
+</div>
+
+<div class='row'>
+	<div class='col-xs-8'>
+		<table>
+			<tr ng-repeat='row in newLevelArray track by $index'>
+				<td ng-repeat='cell in row track by $index'>
+					<button ng-click='log(cell)'>{{cell.value}}</button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class='col-xs-4'>
+		Level name: <input type='text' ng-model='levelName'>
+		<button ng-click='submit()'>Submit</button>
+		{{message}}
+	</div>
+</div>

@@ -1,4 +1,9 @@
-app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
+app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',function(scope,Levels,storage,http){
+
+	scope.playerLogin = "";
+	if(storage.user){
+		scope.playerLogin = "Player logged in: " + storage.user.name;
+	}
 
 	scope.sketch = function(sketch) {
     	// Initialize sketch
@@ -9,6 +14,8 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
     	sketch.gamePlaying = false;
     	sketch.loading = true;
     	sketch.initializing = true;
+
+    	scope.score = 0;
 
     	Levels.query().$promise.then(function(data){
     		console.log(data.length);
@@ -21,17 +28,22 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
     		// sketch.startGame();
     	});
 
-
         sketch.startGame = function(){
 		    sketch.hero.x = 200;
 		    sketch.hero.y = 400;
 		    sketch.hero.life = 1;
+		    scope.life = 1;
 		    sketch.hero.score = 0;
+		    scope.score = 0;
 		    sketch.timer = 0;
 		    sketch.level.generateMap(function(data){
 		    	sketch.level.map = data.map;
 		    	sketch.gamePlaying = true;
 		    	sketch.loading = false;
+		    	sketch.food.changePos();
+		    	scope.level = sketch.level;
+		    	scope.highScores = data.highScores;
+		    	// scope.$apply();
 		    });
 		}
 
@@ -43,15 +55,28 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 		        sketch.nails.splice(i,1);
 		    }
 		    sketch.gamePlaying = false;
+		    if(storage.user){
+		    	http({
+			    	method:'POST',
+			    	url:'api/score',
+			    	cache:false,
+			    	data:{score:scope.score,level:sketch.level, user:storage.user}
+			    }).success(function(data){
+			    	console.log(data);
+			    });
+		    }
 		}
 
         scope.setup = function() {
         	sketch.level = new Level();
     		sketch.level.generateMap(function(data){
+    			scope.highScores = data.highScores;
 		    	sketch.level.map = data.map;
 		    	sketch.size(sketch.sWidth, sketch.sHeight);
 		      	sketch.frameRate(60);
 		      	sketch.hero = new Hero(200, 400, 8, 1, 0, 24.0);
+		      	scope.life = 1;
+		      	scope.level = sketch.level;
 		      	sketch.food = new Food();
 		      	sketch.nails = [];
 		      	sketch.baddies = [];
@@ -63,18 +88,27 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 
     	function Hero(x, y,speed, dirX, dirY, diameter) {
 		    // Public properties, assigned to the instance ('this')
-		    this.x = x;
-	        this.y = y;
+		    // this.x = x;
+	     //    this.y = y;
 	        this.speed = speed;
 	        this.dirX = dirX;
 	        this.dirY = dirY;
 	        this.diameter = diameter;
 	        this.life = 1;
 	        this.score = 0;
-
-	         this.dropNail = function(){
+	        this.setPos = function(){
+		        this.x = Math.floor(Math.random()* (sketch.sWidth - 120)) + 60;
+		        this.y = Math.floor(Math.random()* (sketch.sHeight - 120)) + 60;
+		        if(sketch.level.get(Math.floor(this.y/40),Math.floor(this.x/40)) == "w"){
+		            this.setPos();
+		        }
+		    }
+	        this.setPos();
+	       	this.dropNail = function(){
 		        if(this.life > 1){
 		            this.life -= 1;
+		            scope.life -= 1;
+		            scope.$apply();
 		            sketch.nails.push(new Nail(this.x, this.y));
 		        }
 		    }
@@ -95,6 +129,18 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 		            x1 = Math.floor(((this.x + this.diameter / 2) % sketch.sWidth) / 40);
 		            x2 = Math.floor(((this.x - this.diameter / 2) % sketch.sWidth) / 40);
 		        }
+		        if(y1 < 0){
+		        	y1 += 15
+		        }
+		      	if(y2 < 0){
+		        	y2 += 15
+		        }
+		        if(x1 < 0){
+		        	x1 += 20
+		        }
+		        if(x2 < 0){
+		        	x2 += 20
+		        }
 
 		        if(sketch.level.get(y1,x1) == "w" || sketch.level.get(y2,x2) == "w"){
 		            this.x -= this.dirX*this.speed;
@@ -109,7 +155,7 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 		        }
 		        if(this.y < 0){
 		            this.y += sketch.sHeight;
-		        }else if(this.y >= sketch.sWidth){
+		        }else if(this.y >= sketch.sHeight){
 		            this.y -= sketch.sHeight;
 		        }
 		        sketch.ellipse( this.x, this.y, this.diameter,this.diameter);
@@ -240,6 +286,20 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 			            x2 = Math.floor(((this.x - this.diameter / 2) % sketch.sWidth) / 40);
 			        }
 
+			        if(y1 < 0){
+		        		y1 += 15
+			        }
+			      	if(y2 < 0){
+			        	y2 += 15
+			        }
+			        if(x1 < 0){
+			        	x1 += 20
+			        }
+			        if(x2 < 0){
+			        	x2 += 20
+			        }
+
+
 			        if(sketch.level.get(y1,x1) == "w" || sketch.level.get(y2,x2) == "w"){
 			            this.x -= this.dirX*this.speed;
 			            this.y -= this.dirY*this.speed;
@@ -253,7 +313,7 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 		        }
 		        if(this.y < 0){
 		            this.y += sketch.sHeight;
-		        }else if(this.y >= sketch.sWidth){
+		        }else if(this.y >= sketch.sHeight){
 		            this.y -= sketch.sHeight;
 		        }
 		        sketch.fill(155,39,51);
@@ -290,7 +350,6 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 
 		sketch.keyPressed = function(){
 			// Conditionally display based on string value
-			console.log(sketch.key.code);
 		    if (sketch.key.code == 119) {
 		        sketch.hero.dirX = 0;
 		        sketch.hero.dirY = -1;
@@ -326,9 +385,13 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 		            if(b.isNailed()){
 		                sketch.baddies.splice(i,1);
 		                sketch.hero.score += 1;
+		                scope.score += 1;
+		            	scope.$apply();
 		            }else{
 		                if(b.hitHero()){
 		                    sketch.hero.life -= 1;
+		                    scope.life -= 1;
+		                    scope.$apply();
 		                };
 		                b.update();
 		            }
@@ -342,6 +405,8 @@ app.controller('gameController',['$scope','levelFactory',function(scope,Levels){
 		        sketch.timer += 1;
 				if(sketch.food.isEaten()){
 		            sketch.hero.life += 1;
+		            scope.life += 1;
+		            scope.$apply();
 		        }
 
 		        for(var i = 0; i < sketch.nails.length; i++){
