@@ -42,6 +42,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		    	sketch.loading = false;
 		    	sketch.food.changePos();
 		    	scope.level = sketch.level;
+		    	scope.levelName = data.name;
 		    	scope.highScores = data.highScores;
 		    	// scope.$apply();
 		    });
@@ -71,6 +72,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
         	sketch.level = new Level();
     		sketch.level.generateMap(function(data){
     			scope.highScores = data.highScores;
+    			scope.levelName = data.name;
 		    	sketch.level.map = data.map;
 		    	sketch.size(sketch.sWidth, sketch.sHeight);
 		      	sketch.frameRate(60);

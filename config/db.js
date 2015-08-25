@@ -1,4 +1,6 @@
 // config/db.js
     module.exports = {
-        url : 'mongodb://localhost/game'
+        url : process.env.MONGOLAB_URI
     }
+
+//'mongodb://localhost/game'
