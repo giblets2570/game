@@ -1,4 +1,4 @@
-app.controller('addLevelCtrl', ['$scope','levelFactory', function(scope,Levels){
+app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage', function(scope,Levels,storage){
 
 	scope.newLevel =[ "wwwwwwwwwwwwwwwwwwww",
 			          "w        w         w",
@@ -16,7 +16,13 @@ app.controller('addLevelCtrl', ['$scope','levelFactory', function(scope,Levels){
 			          "w  w       w       w",
 			          "wwwwwwwwwwwwwwwwwwww"];
 
-	scope.message = "Add a new level!";
+
+
+	if(storage.user){
+		scope.message = "Add a new level!";
+	}else{
+		scope.message = "Login to add new levels";
+	}
 
 	var convertToArray = function(){
 		var result = [];
@@ -51,10 +57,12 @@ app.controller('addLevelCtrl', ['$scope','levelFactory', function(scope,Levels){
 	}
 
 	scope.submit = function(){
-		scope.message = "Saving...";
-		Levels.save({map:convertToString(),name:scope.levelName},function(data){
-			console.log(data);
-			scope.message = data.message;
-		});
+		if(storage.user){
+			scope.message = "Saving...";
+			Levels.save({map:convertToString(),name:scope.levelName},function(data){
+				console.log(data);
+				scope.message = data.message;
+			});
+		}
 	};
 }]);
