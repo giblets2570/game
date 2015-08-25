@@ -477,11 +477,18 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		                b.update();
 		            }
 		        }
-
-		        if(sketch.timer%180 == 0){
-		            if(sketch.baddies.length < 40){
-		                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
-		            }
+		        if(scope.score < 60){
+		        	if(sketch.timer%(180 - 2*scope.score) == 0){
+			            if(sketch.baddies.length < 40){
+			                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
+			            }
+			        }
+		        }else{
+		        	if(sketch.timer%60 == 0){
+			            if(sketch.baddies.length < 40){
+			                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
+			            }
+			        }
 		        }
 		        if(sketch.row_kills >= 5){
 		        	sketch.bombs.push(new Bomb());
