@@ -1,9 +1,25 @@
-app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',function(scope,Levels,storage,http){
+app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$modal',function(scope,Levels,storage,http,modal){
 
 	scope.playerLogin = "Login to try for a high score";
 	if(storage.user){
 		scope.playerLogin = "Player logged in: " + storage.user.name;
 	}
+
+	scope.help = function () {
+
+	    var modalInstance = modal.open({
+	      animation: true,
+	      templateUrl: 'myModalContent.html',
+	      // controller: 'ModalInstanceCtrl',
+	      // size: size,
+	      // resolve: {
+	      //   items: function () {
+	      //     return scope.items;
+	      //   }
+	      // }
+	    });
+	};
+
 
 	scope.sketch = function(sketch) {
     	// Initialize sketch
@@ -467,7 +483,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
 		            }
 		        }
-		        if(sketch.row_kills >= 3){
+		        if(sketch.row_kills >= 5){
 		        	sketch.bombs.push(new Bomb());
 		        	sketch.row_kills = 0;
 		        }

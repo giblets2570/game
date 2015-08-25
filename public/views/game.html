@@ -23,6 +23,9 @@
 				</div>
 			</div>
 		</div>
+		<div class='row'>
+			<button class="btn btn-success" ng-click='help()'>Help</button>
+		</div>
 	</div>
 	<div class="col-xs-9"><canvas processing="sketch"></canvas></div>
 	<div class="col-xs-2">
@@ -37,3 +40,22 @@
 		</table>
 	</div>
 </div>
+<script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Ballwars</h3>
+    </div>
+    <div class="modal-body">
+        This is a game where you are the green ball.<br/>
+        You move by either using the arrow keys, or the wasd keys.<br/>
+        You need food to live. Food is the small dark ball. Eat it.<br/>
+        Red balls are trying to kill you. Avoid them or lose a life.<br/>
+        Drop a hole to kill the red balls. Do this with the space bar.<br/>
+        This will give you points. Points are good. <br/>
+        Dropping holes makes you lose life, so make sure to eat.<br/>
+        Kill 5 red balls without losing a life, and a bomb appears.<br/>
+        If you reach the bomb before it disappears, you kill all the red balls.<br/>
+    </div>
+    <div class="modal-footer">
+        Click anywhere outside this to return to ballwars.
+    </div>
+</script>
