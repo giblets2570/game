@@ -55,6 +55,9 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		    for(var i = sketch.nails.length - 1; i >= 0; i--){
 		        sketch.nails.splice(i,1);
 		    }
+		    for(var i = sketch.bombs.length - 1; i >= 0; i--){
+		        sketch.bombs.splice(i,1);
+		    }
 		    sketch.gamePlaying = false;
 		    if(storage.user){
 		    	http({
@@ -82,6 +85,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		      	sketch.food = new Food();
 		      	sketch.nails = [];
 		      	sketch.baddies = [];
+		      	sketch.bombs = [];
 		      	sketch.timer = 0;
 		      	sketch.gamePlaying = true;
 		    	sketch.loading = false;
@@ -207,6 +211,39 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		    }
 		}
 
+		function Bomb() {
+	        this.radius = 30;
+	        this.timer = 90;
+
+	        this.setPos = function(){
+		        this.x = Math.floor(Math.random()* (sketch.sWidth - 120)) + 60;
+		        this.y = Math.floor(Math.random()* (sketch.sHeight - 120)) + 60;
+		        if(sketch.level.get(Math.floor(this.y/40),Math.floor(this.x/40)) == "w"){
+		            this.setPos();
+		        }
+		    }
+
+		    this.setPos();
+
+		    this.update = function(){
+		        sketch.fill(255,216,25);
+		        sketch.stroke(255,255,255);
+		        sketch.ellipse(this.x,this.y,this.radius,this.radius);
+		        sketch.fill(244,129,33);
+		        sketch.arc(this.x,this.y,this.radius,this.radius,0,sketch.TWO_PI * (1 - this.timer/90))
+		        this.timer -= 1;
+		    }
+
+		    this.hitHero = function(){
+		        if(sketch.hero.x - sketch.hero.diameter < this.x && sketch.hero.x + sketch.hero.diameter > this.x
+		            && sketch.hero.y - sketch.hero.diameter < this.y && sketch.hero.y + sketch.hero.diameter > this.y){
+		            this.timer = 60;
+		            return true;
+		        }
+		        return false;
+		    }
+		}
+
 		function Baddie(speed, dirX, dirY, diameter) {
 
 	        this.speed = speed;
@@ -256,7 +293,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		        return false;
 		    }
 
-		     this.hitHero = function(){
+		    this.hitHero = function(){
 		        if(this.timer > 0){
 		            return false;
 		        }
@@ -382,6 +419,24 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 			if(sketch.gamePlaying){
 				sketch.level.draw();
 				sketch.food.draw();
+				for(var i = sketch.bombs.length - 1; i >= 0; i--){
+		        	var b = sketch.bombs[i];
+		        	if(b.hitHero()){
+		        		sketch.hero.score += sketch.baddies.length;
+		                scope.score += sketch.baddies.length;
+		                sketch.bombs.splice(i,1);
+		                for(var i = sketch.baddies.length - 1; i >= 0; i--){
+		                	sketch.baddies.splice(i,1);
+		                }
+		                scope.$apply();
+		        	}else{
+		        		if(b.timer <= 0){
+			        		sketch.bombs.splice(i,1);
+			        	}else{
+			        		b.update();
+			        	}
+		        	}
+		        }
 				for(var i = sketch.baddies.length - 1; i >= 0; i--){
 		            var b = sketch.baddies[i];
 		            if(b.isNailed()){
@@ -403,6 +458,9 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		            if(sketch.baddies.length < 40){
 		                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
 		            }
+		        }
+		        if(sketch.timer%300 == 0){
+                	sketch.bombs.push(new Bomb());
 		        }
 		        sketch.timer += 1;
 				if(sketch.food.isEaten()){
