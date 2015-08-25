@@ -30,7 +30,7 @@
 		<h3>{{playerLogin}}</h3> <br/>
 		Top 5 scores: <br/>
 		<table class="table table-bordered table-hover">
-			<tr ng-repeat='score in highScores'>
+			<tr ng-repeat='score in highScores | orderBy:"-score"'>
 				<td>{{score.userName}}</td>
 				<td>{{score.score}}</td>
 			</tr>
