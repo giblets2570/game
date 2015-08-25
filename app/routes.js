@@ -127,7 +127,7 @@ var Level = require('./models/level');
                     if(err)
                         return res.send(err);
                     if(!level)
-                        return res.send({'error':'No user of that id!'});
+                        return res.send({'error':'No level of that id!'});
                     var highScores = level.highScores;
                     console.log(highScores.length);
                     var index = -1;

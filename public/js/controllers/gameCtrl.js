@@ -41,7 +41,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		    	sketch.gamePlaying = true;
 		    	sketch.loading = false;
 		    	sketch.food.changePos();
-		    	scope.level = sketch.level;
+		    	scope.level = data;
 		    	scope.levelName = data.name;
 		    	scope.highScores = data.highScores;
 		    	// scope.$apply();
@@ -78,7 +78,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		      	sketch.frameRate(60);
 		      	sketch.hero = new Hero(200, 400, 8, 1, 0, 24.0);
 		      	scope.life = 1;
-		      	scope.level = sketch.level;
+		      	scope.level = data;
 		      	sketch.food = new Food();
 		      	sketch.nails = [];
 		      	sketch.baddies = [];
