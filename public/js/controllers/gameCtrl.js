@@ -391,19 +391,20 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 
 		sketch.keyPressed = function(){
 			// Conditionally display based on string value
-		    if (sketch.key.code == 119) {
+			console.log(sketch.keyCode);
+		    if (sketch.key.code == 119 || sketch.keyCode == 38) {
 		        sketch.hero.dirX = 0;
 		        sketch.hero.dirY = -1;
 		    }
-		    if (sketch.key.code == 115) {
+		    if (sketch.key.code == 115 || sketch.keyCode == 40) {
 		        sketch.hero.dirX = 0;
 		        sketch.hero.dirY = 1;
 		    }
-		    if (sketch.key.code == 97) {
+		    if (sketch.key.code == 97 || sketch.keyCode == 37) {
 		        sketch.hero.dirX = -1;
 		        sketch.hero.dirY = 0;
 		    }
-		    if (sketch.key.code == 100) {
+		    if (sketch.key.code == 100 || sketch.keyCode == 39) {
 		        sketch.hero.dirX = 1;
 		        sketch.hero.dirY = 0;
 		    }
@@ -414,6 +415,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		        sketch.startGame();
 		    }
 		}
+
 
 			// Main draw loop
 		sketch.draw = function() {
