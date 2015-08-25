@@ -3,18 +3,30 @@
 </div>
 
 <div class='row'>
-	<div class='col-xs-8'>
-		<table>
-			<tr ng-repeat='row in newLevelArray track by $index'>
-				<td ng-repeat='cell in row track by $index'>
-					<button ng-click='log(cell)'>{{cell.value}}</button>
-				</td>
-			</tr>
-		</table>
+	<div class='col-xs-12'>
+		<center>
+			<table>
+				<tr ng-repeat='row in newLevelArray track by $index'>
+					<td ng-repeat='cell in row track by $index'>
+						<button ng-click='change(cell)' class='{{ getClass(cell) }}'></button>
+					</td>
+				</tr>
+			</table>
+		</center>
 	</div>
+	<div class='col-xs-4'></div>
 	<div class='col-xs-4'>
-		Level name: <input type='text' ng-model='levelName'>
-		<button ng-click='submit()'>Submit</button>
-		{{message}}
+		<div class="input-group">
+	      <input type="text" class="form-control" placeholder="Level name..." ng-model='levelName'>
+	      <span class="input-group-btn">
+	        <button class="btn btn-default" type="button">Submit</button>
+	      </span>
+	    </div><!-- /input-group -->
+	</div>
+	<div class='col-xs-4'></div>
+	<div class='col-xs-12'>
+		<center>
+			<h2> {{message}} </h2>
+		</center>
 	</div>
 </div>

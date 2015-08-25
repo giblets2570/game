@@ -1,4 +1,4 @@
-app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage', function(scope,Levels,storage){
+app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage','$location', function(scope,Levels,storage,location){
 
 	scope.newLevel =[ "wwwwwwwwwwwwwwwwwwww",
 			          "w        w         w",
@@ -48,7 +48,7 @@ app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage', funct
 
 	scope.newLevelArray = convertToArray();
 
-	scope.log = function(cell){
+	scope.change = function(cell){
 		if(scope.newLevelArray[cell.i][cell.j].value == "w"){
 			scope.newLevelArray[cell.i][cell.j].value = " ";
 		}else{
@@ -66,7 +66,16 @@ app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage', funct
 			Levels.save({map:convertToString(),name:scope.levelName},function(data){
 				console.log(data);
 				scope.message = data.message;
+				location.path('/game');
 			});
 		}
 	};
+
+	scope.getClass = function(cell){
+		if(scope.newLevelArray[cell.i][cell.j].value == "w"){
+			return 'mbtn btn btn-success'
+		}
+		return 'mbtn btn btn-default'
+	}
+
 }]);
