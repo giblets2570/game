@@ -61,7 +61,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 			    	method:'POST',
 			    	url:'api/score',
 			    	cache:false,
-			    	data:{score:scope.score,level:sketch.level, user:storage.user}
+			    	data:{score:scope.score,level:scope.level, user:storage.user}
 			    }).success(function(data){
 			    	console.log(data);
 			    });
