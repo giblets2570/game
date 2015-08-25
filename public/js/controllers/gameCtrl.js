@@ -1,6 +1,6 @@
 app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',function(scope,Levels,storage,http){
 
-	scope.playerLogin = "";
+	scope.playerLogin = "Login to try for a high score";
 	if(storage.user){
 		scope.playerLogin = "Player logged in: " + storage.user.name;
 	}
