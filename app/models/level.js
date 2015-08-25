@@ -15,6 +15,10 @@ var levelSchema = mongoose.Schema({
 	    },
 	    userName: String
 	}],
+	creator:{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    },
 
 	map: [String]
 });

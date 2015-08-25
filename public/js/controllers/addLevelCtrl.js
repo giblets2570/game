@@ -1,19 +1,19 @@
 app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage','$location', function(scope,Levels,storage,location){
 
 	scope.newLevel =[ "wwwwwwwwwwwwwwwwwwww",
-			          "w        w         w",
-			          "w wwwww  w w w w w w",
-			          "w     w  w         w",
-			          "w   w w  w w w w w w",
-			          "w     w            w",
-			          "w wwwww            w",
 			          "w                  w",
-			          "w  wwww            w",
-			          "w  w  w     w   w  w",
-			          "w           w   w  w",
-			          "ww          w   w  w",
-			          "w      w        w  w",
-			          "w  w       w       w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
+			          "w                  w",
 			          "wwwwwwwwwwwwwwwwwwww"];
 
 
@@ -58,12 +58,15 @@ app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage','$loca
 
 	scope.submit = function(){
 		if(scope.levelName == null || scope.levelName == ""){
-			scope.message = "Give you level a name!";
+			scope.message = "Give your level a name!";
 			return;
 		}
 		if(storage.user){
 			scope.message = "Saving...";
-			Levels.save({map:convertToString(),name:scope.levelName},function(data){
+			Levels.save({map:convertToString(),
+				name:scope.levelName,
+				user:storage.user
+			},function(data){
 				console.log(data);
 				scope.message = data.message;
 				location.path('/game');
@@ -77,5 +80,4 @@ app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage','$loca
 		}
 		return 'mbtn btn btn-default'
 	}
-
 }]);

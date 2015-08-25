@@ -42,6 +42,7 @@ var Level = require('./models/level');
                         level.map.push(req.body.map[i]);
                     }
                     level.name = req.body.name;
+                    level.user = req.body.user._id;
                     level.save(function(err){
                         if(err)
                             return res.send(err);
