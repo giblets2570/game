@@ -31,6 +31,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
         sketch.startGame = function(){
 		    sketch.hero.x = 200;
 		    sketch.hero.y = 400;
+		    sketch.row_kills = 0;
 		    sketch.hero.life = 1;
 		    scope.life = 1;
 		    sketch.hero.score = 0;
@@ -74,6 +75,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
         scope.setup = function() {
         	sketch.level = new Level();
     		sketch.level.generateMap(function(data){
+    			sketch.row_kills = 0;
     			scope.highScores = data.highScores;
     			scope.levelName = data.name;
 		    	sketch.level.map = data.map;
@@ -213,7 +215,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 
 		function Bomb() {
 	        this.radius = 30;
-	        this.timer = 90;
+	        this.timer = 120;
 
 	        this.setPos = function(){
 		        this.x = Math.floor(Math.random()* (sketch.sWidth - 120)) + 60;
@@ -230,7 +232,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		        sketch.stroke(255,255,255);
 		        sketch.ellipse(this.x,this.y,this.radius,this.radius);
 		        sketch.fill(244,129,33);
-		        sketch.arc(this.x,this.y,this.radius,this.radius,0,sketch.TWO_PI * (1 - this.timer/90))
+		        sketch.arc(this.x,this.y,this.radius,this.radius,0,sketch.TWO_PI * (1 - this.timer/120))
 		        this.timer -= 1;
 		    }
 
@@ -443,11 +445,13 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		                sketch.baddies.splice(i,1);
 		                sketch.hero.score += 1;
 		                scope.score += 1;
+		            	sketch.row_kills += 1;
 		            	scope.$apply();
 		            }else{
 		                if(b.hitHero()){
 		                    sketch.hero.life -= 1;
 		                    scope.life -= 1;
+		                    sketch.row_kills = 0;
 		                    scope.$apply();
 		                };
 		                b.update();
@@ -459,8 +463,9 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
 		            }
 		        }
-		        if(sketch.timer%300 == 0){
-                	sketch.bombs.push(new Bomb());
+		        if(sketch.row_kills >= 3){
+		        	sketch.bombs.push(new Bomb());
+		        	sketch.row_kills = 0;
 		        }
 		        sketch.timer += 1;
 				if(sketch.food.isEaten()){
