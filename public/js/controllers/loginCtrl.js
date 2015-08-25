@@ -2,6 +2,8 @@ app.controller('LoginCtrl', ['$scope','userFactory','$sessionStorage','$http','$
 
 	scope.signup = function(){
 		console.log("Here");
+		if(scope.signupPassword == null || scope.signupPassword == "" || scope.signupName == null || scope.signupName == "")
+			return;
 		Users.save({
 			name:scope.signupName,
 			password:scope.signupPassword
