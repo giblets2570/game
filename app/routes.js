@@ -36,18 +36,23 @@ var Level = require('./models/level');
                         return res.send(err);
                     if(level)
                         return res.send({'message':'Already a level with that name!'});
-
-                    var level = new Level();
-                    for(var i = 0; i < req.body.map.length; i++){
-                        level.map.push(req.body.map[i]);
-                    }
-                    level.name = req.body.name;
-                    level.user = req.body.user._id;
-                    level.save(function(err){
+                    User.findById(req.body.user._id,function(err,user){
                         if(err)
                             return res.send(err);
-                        res.send({'message':'Level added'});
-                    });
+                        if(!user)
+                            return res.send({'error':'No user of that id'});
+                        var level = new Level();
+                        for(var i = 0; i < req.body.map.length; i++){
+                            level.map.push(req.body.map[i]);
+                        }
+                        level.name = req.body.name;
+                        level.creator = user;
+                        level.save(function(err){
+                            if(err)
+                                return res.send(err);
+                            res.send({'message':'Level added'});
+                        });
+                    })
                 })
             })
 

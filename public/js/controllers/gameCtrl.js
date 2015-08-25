@@ -283,6 +283,8 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http',fun
 		        }
 		    }
 
+		    this.chooseNewDir();
+
 		    this.isNailed = function(){
 		        for(var i = sketch.nails.length - 1; i >= 0; i--){
 		            var n =  sketch.nails[i];

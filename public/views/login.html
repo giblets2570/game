@@ -3,7 +3,7 @@
 </div>
 
 <div class='row'>
-	<div class='col-xs-6'>
+	<!-- <div class='col-xs-6'>
 		Signup
 		Name: <input type='text' ng-model='signupName'>
 		Password: <input type='text' ng-model='signupPassword'>
@@ -14,5 +14,35 @@
 		Name: <input type='text' ng-model='loginName'>
 		Password: <input type='password' ng-model='loginPassword'>
 		<button ng-click='login()'>Submit</button>
-	</div>
+	</div> -->
+
+	<div class="col-xs-6">
+        <h2>Signup</h2>
+        <form ng-submit='signup()'>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="agent-name" ng-model='signupName' autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="agent-password" ng-model='signupPassword'>
+            </div>
+            <button type="submit" class="btn btn-warning btn-lg">Signup</button>
+        </form>
+    </div>
+
+    <div class="col-xs-6">
+        <h2>Login</h2>
+        <form ng-submit='login()'>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="agent-name" ng-model='loginName' autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="agent-password" ng-model='loginPassword'>
+            </div>
+            <button type="submit" class="btn btn-warning btn-lg">Login</button>
+        </form>
+    </div>
 </div>
