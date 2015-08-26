@@ -1,4 +1,13 @@
-app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage','$location', function(scope,Levels,storage,location){
+app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage','$location','$modal', function(scope,Levels,storage,location,modal){
+
+	scope.help = function () {
+
+	    var modalInstance = modal.open({
+	      animation: true,
+	      templateUrl: 'myModalContent.html',
+	    });
+	};
+
 
 	scope.newLevel =[ "wwwwwwwwwwwwwwwwwwww",
 			          "w                  w",
@@ -76,7 +85,7 @@ app.controller('addLevelCtrl', ['$scope','levelFactory','$sessionStorage','$loca
 
 	scope.getClass = function(cell){
 		if(scope.newLevelArray[cell.i][cell.j].value == "w"){
-			return 'mbtn btn btn-success'
+			return 'mbtn btn btn-primary'
 		}
 		return 'mbtn btn btn-default'
 	}

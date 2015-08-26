@@ -10,13 +10,6 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 	    var modalInstance = modal.open({
 	      animation: true,
 	      templateUrl: 'myModalContent.html',
-	      // controller: 'ModalInstanceCtrl',
-	      // size: size,
-	      // resolve: {
-	      //   items: function () {
-	      //     return scope.items;
-	      //   }
-	      // }
 	    });
 	};
 
