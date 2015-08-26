@@ -38,8 +38,9 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
     	});
 
         sketch.startGame = function(){
-		    sketch.hero.x = 200;
-		    sketch.hero.y = 400;
+		    sketch.hero.setPos();
+		    sketch.hero.dirX = 0;
+		    sketch.hero.dirY = 0;
 		    sketch.row_kills = 0;
 		    sketch.hero.life = 1;
 		    scope.life = 1;
@@ -90,7 +91,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		    	sketch.level.map = data.map;
 		    	sketch.size(sketch.sWidth, sketch.sHeight);
 		      	sketch.frameRate(60);
-		      	sketch.hero = new Hero(200, 400, 8, 1, 0, 24.0);
+		      	sketch.hero = new Hero(200, 400, 8, 0, 0, 24.0);
 		      	scope.life = 1;
 		      	scope.level = data;
 		      	sketch.food = new Food();
