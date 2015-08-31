@@ -68,9 +68,20 @@ var Level = require('./models/level');
 
             .get(function(req,res){
                 Level.findById(req.params.level_id, function(err,level){
-                    if(err)
-                        return res.send(err);
-                    res.send(level);
+                    if(err){
+                        Level.count().exec(function(err, count){
+                            var random = Math.floor(Math.random() * count);
+                            Level.findOne().skip(random).exec(function (err, level) {
+                                // result is random
+                                if(err)
+                                    return res.send(err);
+                                return res.send(level);
+                            });
+
+                        });
+                    }else{
+                        return res.send(level);
+                    }
                 });
             });
 

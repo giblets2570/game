@@ -1,60 +1,55 @@
 app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$modal',function(scope,Levels,storage,http,modal){
 
-	scope.playerLogin = "Login to try for a high score";
-	if(storage.user){
-		scope.playerLogin = "Player logged in: " + storage.user.name;
-	}
-
 	scope.help = function () {
-
 	    var modalInstance = modal.open({
 	      animation: true,
 	      templateUrl: 'myModalContent.html',
 	    });
 	};
 
+	scope.playerLogin = "Login to try for a high score";
+	if(storage.user){
+		scope.playerLogin = "Player logged in: " + storage.user.name;
+	}else{
+		scope.help();
+	}
 
 	scope.sketch = function(sketch) {
     	// Initialize sketch
 
     	sketch.sWidth = 800;
     	sketch.sHeight = 600;
-
     	sketch.gamePlaying = false;
-    	sketch.loading = true;
-    	sketch.initializing = true;
 
-    	scope.score = 0;
-
-    	Levels.query().$promise.then(function(data){
-    		console.log(data.length);
-    		sketch.maps = [];
-    		for(var i = 0; i < data.length; i++){
-    			sketch.maps.push(data[i]._id);
-    		}
-    		// console.log(sketch.maps);
-    		scope.setup();
-    		// sketch.startGame();
-    	});
+    	sketch.setup = function() {
+        	sketch.level = new Level();
+        	sketch.hero = new Hero(200, 400, 8, 0, 0, 24.0);
+        	sketch.food = new Food();
+        	sketch.frameRate(60);
+        	sketch.nails = [];
+	      	sketch.baddies = [];
+	      	sketch.bombs = [];
+	      	sketch.size(sketch.sWidth, sketch.sHeight);
+			sketch.startGame();
+	    };
 
         sketch.startGame = function(){
-		    sketch.hero.setPos();
-		    sketch.hero.dirX = 0;
-		    sketch.hero.dirY = 0;
-		    sketch.row_kills = 0;
-		    sketch.hero.life = 1;
-		    scope.life = 1;
-		    sketch.hero.score = 0;
-		    scope.score = 0;
-		    sketch.timer = 0;
 		    sketch.level.generateMap(function(data){
-		    	sketch.level.map = data.map;
-		    	sketch.gamePlaying = true;
-		    	sketch.loading = false;
-		    	sketch.food.changePos();
-		    	scope.level = data;
-		    	scope.levelName = data.name;
 		    	scope.highScores = data.highScores;
+		    	scope.levelName = data.name;
+		    	sketch.level.map = data.map;
+		    	sketch.food.changePos();
+		    	sketch.hero.setPos();
+		    	sketch.hero.dirX = 0;
+		    	sketch.hero.dirY = 0;
+		    	scope.level = data;
+		    	sketch.gamePlaying = true;
+		    	scope.life = 1;
+		    	scope.score = 0;
+		    	sketch.row_kills = 0;
+			    sketch.hero.life = 1;
+			    sketch.hero.score = 0;
+			    sketch.timer = 0;
 		    	// scope.$apply();
 		    });
 		}
@@ -82,27 +77,6 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		    }
 		}
 
-        scope.setup = function() {
-        	sketch.level = new Level();
-    		sketch.level.generateMap(function(data){
-    			sketch.row_kills = 0;
-    			scope.highScores = data.highScores;
-    			scope.levelName = data.name;
-		    	sketch.level.map = data.map;
-		    	sketch.size(sketch.sWidth, sketch.sHeight);
-		      	sketch.frameRate(60);
-		      	sketch.hero = new Hero(200, 400, 8, 0, 0, 24.0);
-		      	scope.life = 1;
-		      	scope.level = data;
-		      	sketch.food = new Food();
-		      	sketch.nails = [];
-		      	sketch.baddies = [];
-		      	sketch.bombs = [];
-		      	sketch.timer = 0;
-		      	sketch.gamePlaying = true;
-		    	sketch.loading = false;
-		    });
-	    };
 
     	function Hero(x, y,speed, dirX, dirY, diameter) {
 		    // Public properties, assigned to the instance ('this')
@@ -121,7 +95,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		            this.setPos();
 		        }
 		    }
-	        this.setPos();
+	        // this.setPos();
 	       	this.dropNail = function(){
 		        if(this.life > 1){
 		            this.life -= 1;
@@ -190,7 +164,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		            this.changePos();
 		        }
 		    };
-		    this.changePos();
+		    // this.changePos();
 
 		    this.draw = function() {
 		        sketch.fill(37,39,51);
@@ -208,7 +182,6 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		        }
 		        return false;
 		    }
-
 		}
 
 		function Nail(x, y) {
@@ -377,10 +350,8 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		}
 
 		function Level() {
-
 			this.generateMap = function(callback){
-		        var map_choice = Math.floor((Math.random() * sketch.maps.length));
-		        Levels.get({level_id:sketch.maps[map_choice]},callback);
+		        Levels.get({level_id:"thisisafakeid"},callback);
 		    };
 		    // this.generateMap();
 		    this.get = function(i,j){
@@ -403,7 +374,7 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 
 		sketch.keyPressed = function(){
 			// Conditionally display based on string value
-			console.log(sketch.keyCode);
+			// console.log(sketch.keyCode);
 		    if (sketch.key.code == 119 || sketch.keyCode == 38) {
 		        sketch.hero.dirX = 0;
 		        sketch.hero.dirY = -1;
@@ -428,91 +399,98 @@ app.controller('GameCtrl',['$scope','levelFactory','$sessionStorage','$http','$m
 		    }
 		}
 
+		sketch.game = function(){
+			sketch.level.draw();
+			sketch.food.draw();
+			for(var i = sketch.bombs.length - 1; i >= 0; i--){
+	        	var b = sketch.bombs[i];
+	        	if(b.hitHero()){
+	        		sketch.hero.score += sketch.baddies.length;
+	                scope.score += sketch.baddies.length;
+	                sketch.bombs.splice(i,1);
+	                for(var i = sketch.baddies.length - 1; i >= 0; i--){
+	                	sketch.baddies.splice(i,1);
+	                }
+	                scope.$apply();
+	        	}else{
+	        		if(b.timer <= 0){
+		        		sketch.bombs.splice(i,1);
+		        	}else{
+		        		b.update();
+		        	}
+	        	}
+	        }
+			for(var i = sketch.baddies.length - 1; i >= 0; i--){
+	            var b = sketch.baddies[i];
+	            if(b.isNailed()){
+	                sketch.baddies.splice(i,1);
+	                sketch.hero.score += 1;
+	                scope.score += 1;
+	            	sketch.row_kills += 1;
+	            	scope.$apply();
+	            }else{
+	                if(b.hitHero()){
+	                    sketch.hero.life -= 1;
+	                    scope.life -= 1;
+	                    sketch.row_kills = 0;
+	                    scope.$apply();
+	                };
+	                b.update();
+	            }
+	        }
+	        if(scope.score < 60){
+	        	if(sketch.timer%(180 - 2*scope.score) == 0){
+		            if(sketch.baddies.length < 40){
+		                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
+		            }
+		        }
+	        }else{
+	        	if(sketch.timer%60 == 0){
+		            if(sketch.baddies.length < 40){
+		                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
+		            }
+		        }
+	        }
+	        if(sketch.row_kills >= 5){
+	        	sketch.bombs.push(new Bomb());
+	        	sketch.row_kills = 0;
+	        }
+	        sketch.timer += 1;
+			if(sketch.food.isEaten()){
+	            sketch.hero.life += 1;
+	            scope.life += 1;
+	            scope.$apply();
+	        }
+
+	        for(var i = 0; i < sketch.nails.length; i++){
+            	var n = sketch.nails[i];
+            	n.draw();
+        	}
+        	sketch.text("Hero's life: " + sketch.hero.life + ", Score: " + sketch.hero.score, 0, 10, 80, 40,100);
+        	sketch.hero.update();
+
+        	if(sketch.hero.life <= 0){
+	            sketch.endGame();
+	        }
+		}
+
+		sketch.lose = function(){
+			sketch.text("Score: "+ sketch.hero.score+", play again?: (y for yes)", 0, 10, 80, 40,100);
+			sketch.rect(200,200,100,100);
+			sketch.rect(400,200,100,100);
+		}
 
 			// Main draw loop
 		sketch.draw = function() {
 			sketch.background(183,191,200);
 			if(sketch.gamePlaying){
-				sketch.level.draw();
-				sketch.food.draw();
-				for(var i = sketch.bombs.length - 1; i >= 0; i--){
-		        	var b = sketch.bombs[i];
-		        	if(b.hitHero()){
-		        		sketch.hero.score += sketch.baddies.length;
-		                scope.score += sketch.baddies.length;
-		                sketch.bombs.splice(i,1);
-		                for(var i = sketch.baddies.length - 1; i >= 0; i--){
-		                	sketch.baddies.splice(i,1);
-		                }
-		                scope.$apply();
-		        	}else{
-		        		if(b.timer <= 0){
-			        		sketch.bombs.splice(i,1);
-			        	}else{
-			        		b.update();
-			        	}
-		        	}
-		        }
-				for(var i = sketch.baddies.length - 1; i >= 0; i--){
-		            var b = sketch.baddies[i];
-		            if(b.isNailed()){
-		                sketch.baddies.splice(i,1);
-		                sketch.hero.score += 1;
-		                scope.score += 1;
-		            	sketch.row_kills += 1;
-		            	scope.$apply();
-		            }else{
-		                if(b.hitHero()){
-		                    sketch.hero.life -= 1;
-		                    scope.life -= 1;
-		                    sketch.row_kills = 0;
-		                    scope.$apply();
-		                };
-		                b.update();
-		            }
-		        }
-		        if(scope.score < 60){
-		        	if(sketch.timer%(180 - 2*scope.score) == 0){
-			            if(sketch.baddies.length < 40){
-			                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
-			            }
-			        }
-		        }else{
-		        	if(sketch.timer%60 == 0){
-			            if(sketch.baddies.length < 40){
-			                sketch.baddies.push(new Baddie(9, 1, 0, 20.0));
-			            }
-			        }
-		        }
-		        if(sketch.row_kills >= 5){
-		        	sketch.bombs.push(new Bomb());
-		        	sketch.row_kills = 0;
-		        }
-		        sketch.timer += 1;
-				if(sketch.food.isEaten()){
-		            sketch.hero.life += 1;
-		            scope.life += 1;
-		            scope.$apply();
-		        }
-
-		        for(var i = 0; i < sketch.nails.length; i++){
-	            	var n = sketch.nails[i];
-	            	n.draw();
-	        	}
-	        	sketch.text("Hero's life: " + sketch.hero.life + ", Score: " + sketch.hero.score, 0, 10, 80, 40,100);
-	        	sketch.hero.update();
-
-	        	if(sketch.hero.life <= 0){
-		            sketch.endGame();
-		        }
-
-			}else if(sketch.loading){
-				sketch.text("Loading");
-			}else {
-				sketch.text("Score: "+ sketch.hero.score+", play again?: (y for yes)", 0, 10, 80, 40,100);
+				sketch.game();
+			}else{
+				sketch.lose();
 			}
 
 		};
+
 	};
 
 }]);

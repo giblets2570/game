@@ -2,7 +2,8 @@ app.config(['$routeProvider', '$locationProvider',function (router, provider) {
     router
       .when('/game', {
         templateUrl: 'views/game.html',
-        controller: 'GameCtrl'
+        controller: 'GameCtrl',
+        directive: 'keyDown'
       })
       .when('/login', {
         templateUrl: 'views/login.html',

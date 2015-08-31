@@ -2,11 +2,15 @@
 // server.js
 
 // modules =================================================
-var express        = require('express');
-var app            = express();
-var bodyParser     = require('body-parser');
-var methodOverride = require('method-override');
-var mongoose       = require('mongoose');
+var express        	= require('express');
+var app            	= express();
+var bodyParser     	= require('body-parser');
+var methodOverride 	= require('method-override');
+var mongoose       	= require('mongoose');
+var flash    	   	= require('connect-flash');
+var session      	= require('express-session');
+// var redis 			= require('redis');
+// var client 			= redis.createClient(); //creates a new client
 // configuration ===========================================
 
 // config files
@@ -34,6 +38,31 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 
 // set the static files location /public/img will be /img for users
 app.use(express.static(__dirname + '/public'));
+
+// required for passport
+// app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
+// app.use(passport.initialize());
+// app.use(passport.session()); // persistent login sessions
+// app.use(flash()); // use connect-flash for flash messages stored in session
+
+
+// client.on('connect', function() {
+//     console.log('connected');
+// });
+
+// client.set('framework', 'AngularJS', function(err, reply) {
+//   console.log(reply);
+// });
+
+// client.get('framework', function(err, reply) {
+//     console.log(reply);
+// });
+
+// client.hmset('frameworks', 'javascript', 'AngularJS', 'css', 'Bootstrap', 'node', 'Express');
+
+// client.hgetall('frameworks', function(err, object) {
+//     console.log(object);
+// });
 
 // routes ==================================================
 
